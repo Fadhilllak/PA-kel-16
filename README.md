@@ -25,4 +25,17 @@ user2,50000
 ikmal,45000
 fadhil,295000
 
+========================================
+          Transjakarta Invoice
+========================================
+Username:                          user1
+Nama Bus:                          BUS B
+Jalur Bus:                       Jalur 2
+Waktu Operasi:               07:00-19:00
+Total Harga Tiket:           5000 Rupiah
+Saldo Sisa:                 26500 Rupiah
+========================================
+
+
+
 
