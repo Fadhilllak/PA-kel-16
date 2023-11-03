@@ -1,0 +1,400 @@
+import os
+import csv
+from prettytable import PrettyTable
+from pwinput import pwinput
+
+def clear_screen():
+    os.system("cls" if os.name == "nt" else "clear")
+
+# List berisi username dan password untuk admin dan user
+ADMIN_CREDENTIALS = {"username": "admin", "password": "admin123"}
+USER_CREDENTIALS = [
+    {"username": "user1", "password": "user123"},
+    {"username": "user2", "password": "user456"},
+]
+
+# Menambahkan saldo awal untuk setiap pengguna
+USER_E_MONEY = {"user1":300000, "user2": 300000}
+
+# Menyimpan data saldo e-money dalam file CSV
+E_MONEY_CSV_FILE = "e_money.csv"
+
+USER_TRANSACTIONS = []  # Variabel untuk melacak transaksi pengguna
+
+def authenticate_user():
+    attempts = 0
+    while attempts < 3:
+        username_input = input("Masukkan username: ")
+        password_input = pwinput("Masukkan password: ")
+
+        for user in USER_CREDENTIALS:
+            if user["username"] == username_input and user["password"] == password_input:
+                return username_input
+
+        attempts += 1
+        print("Username atau password salah!")
+
+    print("Anda sudah salah memasukkan password sebanyak 3 kali!")
+    return None
+
+
+def load_e_money_data():
+    global USER_E_MONEY
+    try:
+        with open(E_MONEY_CSV_FILE, mode='r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                USER_E_MONEY[row['username']] = int(row['balance'])
+    except FileNotFoundError:
+        USER_E_MONEY = {user['username']: 300000 for user in USER_CREDENTIALS}
+
+def save_e_money_data():
+    with open(E_MONEY_CSV_FILE, mode='w', newline='') as file:
+        fieldnames = ['username', 'balance']
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+
+        writer.writeheader()
+        for username, balance in USER_E_MONEY.items():
+            writer.writerow({'username': username, 'balance': balance})
+
+def authenticate():
+    attempts = 0
+    while attempts < 3:
+        username_input = input("Masukkan username: ")
+        password_input = pwinput("Masukkan password: ")
+
+        if ADMIN_CREDENTIALS["username"] == username_input and ADMIN_CREDENTIALS["password"] == password_input:
+            return True, "Admin"
+        
+        for user in USER_CREDENTIALS:
+            if user["username"] == username_input and user["password"] == password_input:
+                return True, "User"
+
+        attempts += 1
+        print("Username atau password salah!")
+
+    print("Anda sudah salah memasukkan password sebanyak 3 kali!")
+    return False, None
+
+
+def register_user():
+    print("\nRegistrasi Pengguna Baru")
+    username = input("Masukkan username baru: ")
+    
+    # Mengecek apakah username sudah ada
+    for user in USER_CREDENTIALS:
+        if user['username'] == username:
+            print("Username sudah ada. Silakan coba lagi.")
+            return
+
+    password = pwinput("Masukkan password baru: ")
+    USER_CREDENTIALS.append({'username': username, 'password': password})
+    USER_E_MONEY[username] = 300000
+    save_e_money_data() # Simpan saldo e-money pengguna
+    print("Pengguna berhasil didaftarkan!")
+
+
+daftarbus = []
+
+def databus():
+    table = PrettyTable()
+    for data in daftarbus:  
+        table.field_names = ("ID BUS", "Nama Bus", "Kapasitas Penumpang", "Jalur Bus", "Harga Tiket", "Waktu Operasi")                                               
+        table.add_row([data["id_bus"], data["Nama Bus"], data["Kapasitas Penumpang"], data["Jalur Bus"], data["Harga Tiket"], data["Waktu Operasi"] ])
+    print(table)
+    
+def tambahbus():
+    nama_bus_choices = ["BUS A", "BUS B", "BUS C"]
+    kapasitas_choices = [50, 60, 70]
+    jalur_choices = ["Jalur 1", "Jalur 2", "Jalur 3"]
+    harga_choices = ["5000", "4500", "3000"]
+    waktu_choices = ["06:00-18:00", "07:00-19:00", "08:00-20:00"]
+    
+    while True:
+        try:
+            id_bus = int(input("Masukkan ID Bus: "))
+            break  
+        except ValueError:
+            print("Masukkan Angka Only.")
+    
+    print("Pilih Nama Bus:")
+    for idx, choice in enumerate(nama_bus_choices, 1):
+        print(f"{idx}. {choice}")
+    while True:
+        try:
+            nama_idx = int(input()) - 1
+            if 0 <= nama_idx < len(nama_bus_choices):
+                nama = nama_bus_choices[nama_idx]
+                break  
+            else:
+                print("Pilihan Tidak Tersedia")
+        except ValueError:
+            print("Masukkan Angka Only!")
+
+    print("Pilih Kapasitas:")
+    for idx, choice in enumerate(kapasitas_choices, 1):
+        print(f"{idx}. {choice}")
+    while True:
+        try:
+            kapasitas_idx = int(input()) - 1
+            if 0 <= kapasitas_idx < len(kapasitas_choices):
+                kapasitas = kapasitas_choices[kapasitas_idx]
+                break  
+            else:
+                print("Pilihan Tidak Tersedia")
+        except ValueError:
+            print("Masukkan Angka Only!")
+
+    print("Pilih Jalur:")
+    for idx, choice in enumerate(jalur_choices, 1):
+        print(f"{idx}. {choice}")
+    while True:
+        try:
+            jalur_idx = int(input()) - 1
+            if 0 <= jalur_idx < len(jalur_choices):
+                jalur = jalur_choices[jalur_idx]
+                break  
+            else:
+                print("Pilihan Tidak Tersedia")
+        except ValueError:
+            print("Masukkan Angka Only!")
+
+    print("Pilih Harga Tiket:")
+    for idx, choice in enumerate(harga_choices, 1):
+        print(f"{idx}. {choice}")
+    while True:
+        try:
+            harga_idx = int(input()) - 1
+            if 0 <= harga_idx < len(harga_choices):
+                harga = harga_choices[harga_idx]
+                break  
+            else:
+                print("Pilihan Tidak Tersedia")
+        except ValueError:
+            print("Masukkan Angka Only!")
+
+    print("Pilih Waktu Operasi:")
+    for idx, choice in enumerate(waktu_choices, 1):
+        print(f"{idx}. {choice}")
+    while True:
+        try:
+            waktu_idx = int(input()) - 1
+            if 0 <= waktu_idx < len(waktu_choices):
+                waktu = waktu_choices[waktu_idx]
+                break  
+            else:
+                print("Pilihan Tidak Tersedia")
+        except ValueError:
+            print("Masukkan Angka Only!")
+
+    daftarbus.append({"id_bus": id_bus, "Nama Bus": nama, "Kapasitas Penumpang": kapasitas, "Jalur Bus": jalur, "Harga Tiket": harga, "Waktu Operasi": waktu})
+    print(f"Bus dengan ID {id_bus} berhasil ditambahkan!")
+
+
+def ubahdata():
+    databus()
+    while True:
+        try:
+            nama_bus_choices = ["BUS A", "BUS B", "BUS C"]
+            kapasitas_choices = [50, 60, 70]
+            jalur_choices = ["Jalur 1", "Jalur 2", "Jalur 3"]
+            harga_choices = ["5000", "4500", "3000"]
+            waktu_choices = ["06:00-18:00", "07:00-19:00", "08:00-20:00"]
+            id_bus_to_update = int(input("Masukkan ID Bus yang ingin diubah: "))  # Minta pengguna untuk memasukkan ID Bus yang ingin diubah
+            
+            for idx, data in enumerate(daftarbus):
+                if data["id_bus"] == id_bus_to_update:
+                        
+                        for i, choice in enumerate(nama_bus_choices, 1):
+                            print(f"{i}. {choice}")
+                        nama_idx = int(input("Masukkan ID nama baru: ")) -1
+                        new_name = nama_bus_choices[nama_idx]
+                        daftarbus[idx]["Nama Bus"] = new_name
+
+                        for i, choice in enumerate(kapasitas_choices, 1):
+                            print(f"{i}. {choice}")
+                        kapasitas_idx = int(input("Masukkan kapsitas baru: ")) - 1
+                        kapasitas_baru = kapasitas_choices[kapasitas_idx]
+                        daftarbus[idx]["Kapasitas Penumpang"] = kapasitas_baru
+                        
+                        for i, choice in enumerate(jalur_choices, 1):
+                            print(f"{i}. {choice}")
+                        jalur_idx = int(input("Masukkan jalur baru: ")) - 1
+                        jalur_baru = jalur_choices[jalur_idx]
+                        daftarbus[idx]["Jalur Bus"] = jalur_baru
+                        
+                        for i, choice in enumerate(harga_choices, 1):
+                            print(f"{i}. {choice}")
+                        harga_idx = int(input("Masukkan harga baru: ")) - 1
+                        harga_baru = harga_choices[harga_idx]
+                        daftarbus[idx]["Harga Tiket"] = harga_baru
+                        
+                        for i, choice in enumerate(waktu_choices, 1):
+                            print(f"{i}. {choice}")
+                        waktu_idx = int(input("Masukkan waktu baru: ")) - 1
+                        waktu_baru = waktu_choices[waktu_idx]
+                        daftarbus[idx]["Waktu Operasi"] = waktu_baru
+                        print(f"Data Bus dengan ID {id_bus_to_update} berhasil diperbarui!")
+                        return
+   
+        except:
+            print("Angka Only")
+        
+def hapus():    
+    databus()
+    id_bus = int(input("Masukkan ID Bus Yang Ingin Di Hapus(Masukkan Sesuai ID): "))
+    for data in daftarbus:
+        if data['id_bus'] == id_bus:
+            daftarbus.remove(data)
+            print("Data Bus Berhasil Di Hapus")
+            return
+        
+def pesan_tiket(username):
+        try:
+            id_bus = int(input("Masukkan Tiket Bus (Masukkan ID): "))
+            for data in daftarbus:
+                if data["id_bus"] == id_bus:
+                    if data["Kapasitas Penumpang"] > 0:
+                        data["Kapasitas Penumpang"] -= 1
+                        print("Tiket berhasil dipesan!")
+                    
+                    harga_tiket = int(data["Harga Tiket"]) 
+
+                    # Mengurangi saldo E-Money pengguna
+                    if username in USER_E_MONEY and USER_E_MONEY[username] >= harga_tiket:
+                        USER_E_MONEY[username] -= harga_tiket
+                        print(f"Saldo E-Money Anda: {USER_E_MONEY[username]} Rupiah")
+                        save_e_money_data()  # Simpan perubahan saldo E-Money ke file CSV
+                        # Menyimpan informasi transaksi ke USER_TRANSACTIONS
+                        USER_TRANSACTIONS.append({"username": username, "bus_id": id_bus, "harga_tiket": harga_tiket})
+                    else:
+                        print("Saldo E-Money anda tidak mencukupi.")
+                else:
+                    print("Bus dengan ID tersebut tidak ditemukan!")
+        except:
+            print("Masukkan Angka Only!")
+            
+def hitung_total_transaksi(username):
+    total_harga = 0
+    for transaksi in USER_TRANSACTIONS:
+        if transaksi["username"] == username:
+            total_harga += transaksi["harga_tiket"]
+    return total_harga
+
+def generate_invoice(username):
+    for databus in daftarbus:
+        if username in USER_E_MONEY:
+            total_harga = hitung_total_transaksi(username)
+            saldo_sisa = USER_E_MONEY[username]
+
+            invoice = f"{'='*40}\n"
+            invoice += f"{'Transjakarta Invoice':^40}\n"
+            invoice += f"{'='*40}\n"
+            invoice += f"{'Username:':<15}{username:>25}\n"
+            invoice += f"{'Nama Bus:':<15}{databus['Nama Bus']:>25}\n"
+            invoice += f"{'Jalur Bus:':<15}{databus['Jalur Bus']:>25}\n"
+            invoice += f"{'Waktu Operasi:':<15}{databus['Waktu Operasi']:>25}\n"
+            invoice += f"{'Total Harga Tiket:':<15}{total_harga:>15} Rupiah\n"
+            invoice += f"{'Saldo Sisa:':<15}{saldo_sisa:>18} Rupiah\n"
+            invoice += f"{'='*40}\n"
+
+            print(invoice)
+        else:
+            print("Gagal membuat invoice. Data pengguna tidak valid.")
+
+
+                
+            
+def menu_admin():
+    while True:
+        try:
+            print("\nMenu Admin Transjakarta")
+            print("1. Tambah Bus Baru")
+            print("2. Tampilkan Semua Bus")
+            print("3. Perbarui Data Bus")
+            print("4. Hapus Data Bus")
+            print("5. Kembali ke Menu Utama")
+            pilihan = int(input("Pilih aksi: "))
+
+            if pilihan == 1:
+                tambahbus()
+            elif pilihan == 2:
+                databus()
+            elif pilihan == 3:
+                ubahdata()
+            elif pilihan == 4:
+                hapus()
+            elif pilihan == 5:
+                break
+            else:
+                print("Menu Tidak Ada")
+        except:
+            print("Masukkan Angka Only")
+
+
+def menu_user(username):
+    while True:
+        try:
+            print("\nMenu Pengguna Transjakarta")
+            print("1. Lihat Semua Bus")
+            print("2. Pesan Tiket")
+            print("3. Cek Saldo E-Money")
+            print("4. Generate Invoice")
+            print("5. Kembali ke Menu Utama")
+            pilihan = int(input("Pilih aksi: "))
+
+            if pilihan == 1:
+                databus()
+            elif pilihan == 2:
+                databus()
+                pesan_tiket(username)
+            elif pilihan == 3:
+                if username in USER_E_MONEY:
+                    print(f"Saldo E-Money Anda: {USER_E_MONEY[username]} Rupiah")
+                else:
+                    print("Pengguna tidak ditemukan.")
+            elif pilihan == 4:
+                generate_invoice(username)
+            elif pilihan == 5:
+                break
+            else:
+                print("Menu Tidak Ada")
+        except:
+            print("Masukkan Angka Only")
+
+
+
+def main():
+    clear_screen()
+    while True:
+        try:
+            print("\nSistem Bus Transjakarta")
+            print("1. Login sebagai Admin")
+            print("2. Login sebagai Pengguna")
+            print("3. Registrasi Pengguna Baru")
+            print("4. Keluar")
+            pilihan = int(input("Pilih menu: "))
+
+            if pilihan == 1:
+                success, user_type = authenticate()
+                if success and user_type == "Admin":
+                    menu_admin()
+            elif pilihan == 2:
+                username = authenticate_user()
+                if username:
+                    menu_user(username)
+            elif pilihan == 3:
+                register_user()
+            elif pilihan == 4:
+                clear_screen()
+                print("Terima kasih telah menggunakan Sistem Bus Transjakarta!")
+                break
+            else:
+                print("Menu Tidak Ada")
+        except:
+            print("Masukkan Angka Only")
+
+if __name__ == "__main__":
+    load_e_money_data() # Memuat data saldo e-money dari file CSV
+    main()
+    save_e_money_data() # Menyimpan data saldo e-money kembali ke file
